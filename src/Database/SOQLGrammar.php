@@ -38,7 +38,7 @@ class SOQLGrammar extends Grammar
 	 */
 	protected function wrapValue($value)
 	{
-		return $value === '*' ? $value : '`'.str_replace('`', '``', $value).'`';
+		return $value;
 	}
 
 	protected function unWrapValue($value)
@@ -59,10 +59,13 @@ class SOQLGrammar extends Grammar
 			return sprintf(
 				'(not %s like %s)',
 				$this->wrap($where['column']),
-				$this->parameter($where['value'])
+				$this->wrap($where['value'])
 			);
 		}
-		return parent::whereBasic($query, $where);
+		$string = parent::whereBasic($query, $where);
+		$string = str_replace('`', '', $string);
+		$string = str_replace('?', '\'?\'', $string);
+		return $string;
 	}
 
 	/**
